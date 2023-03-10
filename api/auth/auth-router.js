@@ -18,7 +18,7 @@ router.post(
       .then((response) => {
         response
           ? res.status(201).json(response)
-          : next({ status: 408, message: "You could not regist" });
+          : next({ status: 404, message: "You could not regist" });
       })
       .catch((err) => next({ status: 500, message: "database problem" }));
 
@@ -52,7 +52,7 @@ router.post(
 
 router.post(
   "/login",
-  authMd.checkPayload,
+  authMd.checkPayload2,
   authMd.checkUsernameExisting,
   async (req, res, next) => {
     const searchedUser = await db("users")

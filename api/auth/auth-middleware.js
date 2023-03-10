@@ -4,17 +4,18 @@ const { JWT_SECRET } = require("../secret/secret");
 
 function restricted(req, res, next) {
   const token = req.headers.authorization;
+  console.log(token);
   if (token) {
     jwt.verify(token, JWT_SECRET, (err, decodeJwt) => {
       if (err) {
-        next({ status: 405, message: "invalid token" });
+        next({ status: 404, message: "invalid token" });
       } else {
         req.userData = decodeJwt;
         next();
       }
     });
   } else {
-    next({ status: 405, message: "Token not found" });
+    next({ status: 404, message: "Token not found" });
   }
 }
 
@@ -24,7 +25,21 @@ function checkPayload(req, res, next) {
   keyArray.forEach((key) => {
     !req.body[key] &&
       next({
-        status: 402,
+        status: 404,
+        message: `${key} property is missing`,
+      });
+  });
+
+  next();
+}
+
+function checkPayload2(req, res, next) {
+  const keyArray = ["username", "password"];
+
+  keyArray.forEach((key) => {
+    !req.body[key] &&
+      next({
+        status: 404,
         message: `${key} property is missing`,
       });
   });
@@ -37,7 +52,7 @@ async function uniqueUsername(req, res, next) {
     .where("username", req.body.username)
     .first();
   searchedUser
-    ? next({ status: 407, message: "username is already used" })
+    ? next({ status: 404, message: "username is already used" })
     : next();
 }
 
@@ -54,7 +69,7 @@ function roleCheck(req, res, next) {
   const role = req.userData.rolename;
   role === "admin"
     ? next()
-    : next({ status: 409, message: "No authorization to add riddle" });
+    : next({ status: 404, message: "No authorization to add riddle" });
 }
 
 module.exports = {
@@ -63,4 +78,5 @@ module.exports = {
   checkUsernameExisting,
   restricted,
   roleCheck,
+  checkPayload2,
 };

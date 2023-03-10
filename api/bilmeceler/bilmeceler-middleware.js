@@ -17,7 +17,7 @@ function payloadCheck(req, res, next) {
 
   keyArray.forEach((key) => {
     !req.body[key] &&
-      next({ status: 402, message: `${key} property is missing` });
+      next({ status: 404, message: `${key} property is missing` });
   });
   next();
 }
@@ -28,12 +28,12 @@ async function checkUniqueRiddle(req, res, next) {
     .first();
 
   searchRiddle
-    ? next({ status: 406, message: "This riddle is already uploaded" })
+    ? next({ status: 404, message: "This riddle is already uploaded" })
     : next();
 }
 function checkUniqueId(req, res, next) {
   const searchRiddle = RiddleModels.getById(req.body.id).then((response) => {
-    response ? next({ status: 406, message: "This id is not unique" }) : next();
+    response ? next({ status: 404, message: "This id is not unique" }) : next();
   });
 }
 
